@@ -24,7 +24,7 @@ app.use(session({
 }));
 
 // to read json requests
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 // CORS
@@ -62,7 +62,27 @@ app.use('/dashboard',
     }
 );
 
-app.use('/api', ApiController);
+app.use('/docker',
+    (requ, res) => {
+        ApiController.docker.info()
+        .then(data => {
+            res.render('docker', {
+                title: 'Docker',
+                containersRunning: data.ContainersRunning,
+                containersPaused: data.ContainersPaused,
+                kernelVersion: data.kernelVersion,
+                serverVersion: data.serverVersion,
+                operatingSystem: data.OperatingSystem,
+                architecture: data.Architecture,
+                images: data.Images,
+                containers: data.Containers,
+                state: data.SystemStatus !== null ? data.SystemStatus.filter(data => data[0] === 'State')[0][1] : 'unknown',
+            });
+        });
+    }
+);
+
+app.use('/api', ApiController.router);
 
 // unhandled exceptions
 app.use((err, req, res, next) => {

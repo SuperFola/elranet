@@ -1,0 +1,44 @@
+<% include header %>
+
+<h3>Docker informations</h3>
+
+<table class="table">
+    <tr>
+        <th>State</th>
+        <td><%= state %></td>
+    </tr>
+    <tr>
+        <th>Containers</th>
+        <td><%= containers %></td>
+    </tr>
+    <tr>
+        <th>Containers running</th>
+        <td><%= containersRunning %></td>
+    </tr>
+    <tr>
+        <th>Containers paused</th>
+        <td><%= containersPaused %></td>
+    </tr>
+    <tr>
+        <th>Images</th>
+        <td><%= images %></td>
+    </tr>
+    <tr>
+        <th>Kernel version</th>
+        <td><%= kernelVersion %></td>
+    </tr>
+    <tr>
+        <th>Server version</th>
+        <td><%= serverVersion %></td>
+    </tr>
+    <tr>
+        <th>Operating system</th>
+        <td><%= operatingSystem %></td>
+    </tr>
+    <tr>
+        <th>Architecture</th>
+        <td><%= architecture %></td>
+    </tr>
+</table>
+
+<% include footer %>

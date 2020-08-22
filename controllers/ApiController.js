@@ -18,10 +18,8 @@ router.get('/containers', (req, res) => {
 });
 
 router.post('/containers', (req, res) => {
-    logger.info(JSON.stringify(req.body));
-
     if (req.body.newContainerSelectImage === undefined)
-        throw new Error('Missing parameters to create a new container');
+        return res.json({ error: 'Missing parameters to create a new container', });
 
     if (!req.body.containerCommand)
         req.body.containerCommand = '';
@@ -43,32 +41,36 @@ router.post('/containers', (req, res) => {
         (err, data, container) => {
             if (err) {
                 logger.error(err);
-                return res.json({error: `while creating container: ${err}` });
+                return res.json({ error: `while creating container: ${err}` });
             } else {
                 logger.info(data);
-                return res.json({ message: 'success' });
+                return res.json({ success: 'container was created' });
             }
         }
     ).on('container', container => {
         if (req.body.volumes && req.body.volumes.split('\n').length !== 0)
             container.defaultOptions.start.Binds = req.body.volumes.split('\n');
     });
+    return res.json({ success: 'container was created' });
 });
 
 router.delete('/containers/:id', (req, res) => {
     if (!req.params.id)
-        throw new Error('Need the id of the container to kill');
+        return res.json({ error: 'Need the id of the container to kill', });
 
     let container = docker.getContainer(req.params.id);
     if (container) {
+        let ok = false;
         container.kill((err, data) => {
             if (err)
-                throw new Error(`When trying to kill container: ${err}`)
+                return res.json({ error: `When trying to kill container: ${err}`, });
+            else
+                ok = true;
         });
-        res.json({ message: 'container was killed' });
-        return;
+        if (ok)
+            return res.json({ success: 'container was killed',  });
     } else {
-        throw new Error('Couln\'t find the container');
+        return res.json({ error: 'Couln\'t find the container', });
     }
 });
 
@@ -90,4 +92,7 @@ router.get('/networks', (req, res) => {
     });
 });
 
-module.exports = router;
+module.exports = {
+    router: router,
+    docker: docker,
+};

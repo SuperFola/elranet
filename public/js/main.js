@@ -1,3 +1,32 @@
+function addPopup(message, type) {
+    let popUpZone = document.getElementById('popUpZone');
+
+    let obj = document.createElement('div');
+    obj.className = `alert alert-${type} alert-dismissible fade show`;
+    obj.attributes.role = "alert";
+
+    if (type === 'danger')
+        obj.innerHTML = `<strong>Oops!</strong> An error occured: ${message}`;
+    else if (type === 'success')
+        obj.innerHTML = `<strong>Hooray!</strong> ${message}`;
+    else
+        obj.innerHTML = `${message}`;
+
+    obj.innerHTML += `<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>`;
+
+    popUpZone.appendChild(obj);
+}
+
+// add a popup message depending on the type of json received from the api
+function handleJsonMessage(json, onlyBad=false) {
+    if (json.error)
+        addPopup(json.error, 'danger');
+    else if (json.success && !onlyBad)  // sometime we need to handle only the errors
+        addPopup(json.success, 'success');
+}
+
 function loadContainersList() {
     fetch('/api/containers', {
         method: 'GET',
@@ -47,13 +76,47 @@ function loadContainersList() {
     });
 }
 
+function createContainer() {
+    // gather the form data to send to the api
+    let data = {
+        containerName: document.getElementById('containerName').value,
+        attachStdin: document.getElementById('attachStdin').value,
+        attachStdout: document.getElementById('attachStdout').value,
+        attachStderr: document.getElementById('attachStderr').value,
+        tty: document.getElementById('tty').value,
+        volumes: document.getElementById('volumes').value,
+        newContainerSelectImage: document.getElementById('newContainerSelectImage').value,
+        containerCommand: document.getElementById('containerCommand').value,
+    };
+
+    fetch('/api/containers', {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(res => res.json())
+    .then(json => {
+        handleJsonMessage(json);
+
+        // close the pop since the job is done or failed, the user needs to see the message
+        $('#newContainerModal').modal('hide');
+        // reload container list since it changed
+        loadContainersList();
+    });
+}
+
 function killContainer(id) {
     fetch(`/api/containers/${id}`, {
         method: 'DELETE',
     })
     .then(res => res.json())
     .then(json => {
-        console.log(json);
+        handleJsonMessage(json, onlyBad=true);
+        // refresh the list since we removed an element
+        console.log("refresh")
+        loadContainersList();
     });
 }
 
@@ -67,9 +130,12 @@ function loadImagesList() {
         select.innerHTML = '';
 
         for (let image of json) {
-            let option = document.createElement('option');
-                option.innerHTML = image.RepoTags[0];
-            select.appendChild(option);
+            // don't add untagged images, they are of no use
+            if (image.RepoTags !== null) {
+                let option = document.createElement('option');
+                    option.innerHTML = image.RepoTags[0];
+                select.appendChild(option);
+            }
         }
     });
 }
