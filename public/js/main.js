@@ -22,6 +22,17 @@ function loadContainersList() {
                     state.innerHTML = container.State;
                 let status = document.createElement('td');
                     status.innerHTML = container.Status;
+                let action = document.createElement('td');
+                    action.innerHTML = `<div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        Action
+    </button>
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+        <button class="btn btn-danger dropdown-item" href="#">Action</button>
+        <button class="btn dropdown-item" href="#">Another action</button>
+        <button class="btn dropdown-item" href="#">Something else here</button>
+    </div>
+</div>`;
 
             tr.appendChild(id);
             tr.appendChild(name);
@@ -29,6 +40,7 @@ function loadContainersList() {
             tr.appendChild(cmd);
             tr.appendChild(state);
             tr.appendChild(status);
+            tr.appendChild(action);
 
             tbody.appendChild(tr);
         }
