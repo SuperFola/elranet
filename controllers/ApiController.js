@@ -2,6 +2,7 @@
 
 const express = require('express');
 const Dockerode = require('dockerode');
+const logger = require('../logger');
 
 const router = express.Router();
 // connect to the docker socket
@@ -17,15 +18,53 @@ router.get('/containers', (req, res) => {
 });
 
 router.post('/containers', (req, res) => {
+    logger.info(JSON.stringify(req.body));
+
+    if (req.body.newContainerSelectImage === undefined)
+        throw new Error('Missing parameters to create a new container');
+
+    if (!req.body.containerCommand)
+        req.body.containerCommand = '';
+
+    let options = {
+        Tty: req.body.tty === 'on',
+        AttachStdin: req.body.attachStdin === 'on',
+        AttachStdout: req.body.attachStdout === 'on',
+        AttachStderr: req.body.attachStderr === 'on',
+    };
+    if (req.body.containerName !== '')
+        options.name = req.body.containerName;
+
+    docker.run(
+        req.body.newContainerSelectImage,
+        req.body.containerCommand.split(' '),
+        process.stdout,  // stream output
+        options,
+        (err, data, container) => {
+            if (err) {
+                logger.error(err);
+                return res.json({error: `while creating container: ${err}` });
+            } else {
+                logger.info(data);
+                return res.json({ message: 'success' });
+            }
+        }
+    ).on('container', container => {
+        if (req.body.volumes && req.body.volumes.split('\n').length !== 0)
+            container.defaultOptions.start.Binds = req.body.volumes.split('\n');
+    });
 });
 
 router.delete('/containers/:id', (req, res) => {
-    if (!req.params.id) {
+    if (!req.params.id)
         throw new Error('Need the id of the container to kill');
-    }
 
     let container = docker.getContainer(req.params.id);
     if (container) {
+        container.kill((err, data) => {
+            if (err)
+                throw new Error(`When trying to kill container: ${err}`)
+        });
         res.json({ message: 'container was killed' });
         return;
     } else {

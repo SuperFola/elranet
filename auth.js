@@ -7,13 +7,13 @@ const logger = require('./logger');
 
 exports.ensureLoggedIn = async (req, res, next) => {
     if (req.session.user === undefined)
-        res.redirect('/');
+        return res.redirect('/');
     next();
 };
 
 exports.ensureNotLoggedIn = (req, res, next) => {
     if (req.session.user !== undefined)
-        res.redirect('/');
+        return res.redirect('/');
     next();
 };
 

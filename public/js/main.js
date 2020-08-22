@@ -28,9 +28,9 @@ function loadContainersList() {
         Action
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <a class="dropdown-item bg-danger text-white" onclick="">Kill</a>
-        <a class="dropdown-item" onclick="">Another action</a>
-        <a class="dropdown-item" onclick="">Something else here</a>
+        <a class="dropdown-item bg-danger text-white" href="#" onclick="killContainer('${container.Id}')">Kill</a>
+        <a class="dropdown-item" href="#" onclick="">Another action</a>
+        <a class="dropdown-item" href="#" onclick="">Something else here</a>
     </div>
 </div>`;
 
@@ -45,4 +45,36 @@ function loadContainersList() {
             tbody.appendChild(tr);
         }
     });
+}
+
+function killContainer(id) {
+    fetch(`/api/containers/${id}`, {
+        method: 'DELETE',
+    })
+    .then(res => res.json())
+    .then(json => {
+        console.log(json);
+    });
+}
+
+function loadImagesList() {
+    fetch('/api/images', {
+        method: 'GET',
+    })
+    .then(res => res.json())
+    .then(json => {
+        let select = document.getElementById('newContainerSelectImage');
+        select.innerHTML = '';
+
+        for (let image of json) {
+            let option = document.createElement('option');
+                option.innerHTML = image.RepoTags[0];
+            select.appendChild(option);
+        }
+    });
+}
+
+function newContainerModal() {
+    $('#newContainerModal').modal();
+    loadImagesList();
 }
