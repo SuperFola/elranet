@@ -57,7 +57,7 @@ app.use('/dashboard',
     (req, res) => {
         return res.render('dashboard', {
             title: 'Dashboard',
-            user: req.body.username,
+            user: req.session.user,
         });
     }
 );

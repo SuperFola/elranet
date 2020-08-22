@@ -1,7 +1,30 @@
 <% include header %>
 
+<h2>Elranet Dashboard</h2>
+
 <p>
     Welcome, <%= user %>
 </p>
+
+<h3>Your containers</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Image</th>
+            <th scope="col">Command</th>
+            <th scope="col">State</th>
+            <th scope="col">Status</th>
+        </tr>
+    </thead>
+    <tbody id="container_list">
+    </tbody>
+</table>
+
+<script type="text/javascript">
+    setInterval(loadContainersList, 5000);  // every 5 seconds, refresh list
+</script>
 
 <% include footer %>
