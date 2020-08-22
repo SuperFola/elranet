@@ -21,8 +21,7 @@ router.post('/containers', (req, res) => {
 
 router.delete('/containers/:id', (req, res) => {
     if (!req.params.id) {
-        res.json(new Error('Need the id of the container to kill'));
-        return;
+        throw new Error('Need the id of the container to kill');
     }
 
     let container = docker.getContainer(req.params.id);
@@ -30,8 +29,7 @@ router.delete('/containers/:id', (req, res) => {
         res.json({ message: 'container was killed' });
         return;
     } else {
-        res.send(new Error('Couln\'t find the container'));
-        return;
+        throw new Error('Couln\'t find the container');
     }
 });
 

@@ -12,6 +12,9 @@
 
     <!-- CSS only -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <!-- custom css -->
+    <link rel="stylesheet" href="/public/css/signin.css">
+    <link rel="stylesheet" href="/public/css/footer.css">
 
     <!-- JS, Popper.js, and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
@@ -21,7 +24,8 @@
     <script src="/public/js/main.js" type="text/javascript"></script>
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
+    <% if (title != 'Login') { %>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Elranet</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -50,4 +54,6 @@
             </ul>
         </div>
     </nav>
-    <div class="container">
+    <% } %>
+    <main role="main" class="flex-shrink-0">
+        <div class="container">

@@ -28,9 +28,9 @@ function loadContainersList() {
         Action
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <button class="btn btn-danger dropdown-item" href="#">Action</button>
-        <button class="btn dropdown-item" href="#">Another action</button>
-        <button class="btn dropdown-item" href="#">Something else here</button>
+        <a class="dropdown-item bg-danger text-white" onclick="">Kill</a>
+        <a class="dropdown-item" onclick="">Another action</a>
+        <a class="dropdown-item" onclick="">Something else here</a>
     </div>
 </div>`;
 
