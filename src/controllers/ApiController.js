@@ -1,12 +1,10 @@
 'use strict';
 
 const express = require('express');
-const Dockerode = require('dockerode');
 const logger = require('../logger');
 
 const router = express.Router();
-// connect to the docker socket
-let docker = new Dockerode({ socketPath: '/var/run/docker.sock' });
+const docker = require('../docker');
 
 // ---------------- CONTAINERS ------------------ //
 
@@ -17,6 +15,7 @@ router.get('/containers', (req, res) => {
     });
 });
 
+// create a new container
 router.post('/containers', (req, res) => {
     if (req.body.newContainerSelectImage === undefined)
         return res.json({ error: 'Missing parameters to create a new container', });
@@ -54,6 +53,7 @@ router.post('/containers', (req, res) => {
     return res.json({ success: 'container was created' });
 });
 
+// stop a container
 router.delete('/containers/:id', (req, res) => {
     if (!req.params.id)
         return res.json({ error: 'Need the id of the container to kill', });
@@ -61,7 +61,7 @@ router.delete('/containers/:id', (req, res) => {
     let container = docker.getContainer(req.params.id);
     if (container) {
         let ok = false;
-        container.kill((err, data) => {
+        container.stop((err, data) => {
             if (err)
                 return res.json({ error: `When trying to kill container: ${err}`, });
             else
@@ -92,7 +92,4 @@ router.get('/networks', (req, res) => {
     });
 });
 
-module.exports = {
-    router: router,
-    docker: docker,
-};
+exports.router = router;

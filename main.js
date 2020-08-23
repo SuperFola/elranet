@@ -6,10 +6,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const session = require('express-session');
 
-const auth = require('./auth');
-const logger = require('./logger');
+const auth = require('./src/auth');
+const logger = require('./src/logger');
 
-const ApiController = require('./controllers/ApiController');
+const LoginController = require('./src/controllers/LoginController');
+const ApiController = require('./src/controllers/ApiController');
+const DashboardController = require('./src/controllers/DashboardController');
+const DockerController = require('./src/controllers/DockerController');
 
 const app = express();
 
@@ -48,40 +51,13 @@ app.get('/', async (req, res) => {
 });
 
 // authentification
-auth.run(app);
+app.use(LoginController.router);
 app.use(auth.ensureLoggedIn);
 
 // from here, every registered route needs the user to be logged in
 
-app.use('/dashboard',
-    (req, res) => {
-        return res.render('dashboard', {
-            title: 'Dashboard',
-            user: req.session.user,
-        });
-    }
-);
-
-app.use('/docker',
-    (requ, res) => {
-        ApiController.docker.info()
-        .then(data => {
-            res.render('docker', {
-                title: 'Docker',
-                containersRunning: data.ContainersRunning,
-                containersPaused: data.ContainersPaused,
-                kernelVersion: data.kernelVersion,
-                serverVersion: data.serverVersion,
-                operatingSystem: data.OperatingSystem,
-                architecture: data.Architecture,
-                images: data.Images,
-                containers: data.Containers,
-                state: data.SystemStatus !== null ? data.SystemStatus.filter(data => data[0] === 'State')[0][1] : 'unknown',
-            });
-        });
-    }
-);
-
+app.use('/dashboard', DashboardController.router);
+app.use('/docker', DockerController.router);
 app.use('/api', ApiController.router);
 
 // unhandled exceptions
