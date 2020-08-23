@@ -24,10 +24,10 @@ router.post('/containers', (req, res) => {
         req.body.containerCommand = '';
 
     let options = {
-        Tty: req.body.tty === 'on',
-        AttachStdin: req.body.attachStdin === 'on',
-        AttachStdout: req.body.attachStdout === 'on',
-        AttachStderr: req.body.attachStderr === 'on',
+        Tty: req.body.tty,
+        AttachStdin: req.body.attachStdin,
+        AttachStdout: req.body.attachStdout,
+        AttachStderr: req.body.attachStderr,
     };
     if (req.body.containerName !== '')
         options.name = req.body.containerName;
@@ -53,7 +53,7 @@ router.post('/containers', (req, res) => {
     return res.json({ success: 'container was created' });
 });
 
-// stop a container
+// kill a container
 router.delete('/containers/:id', (req, res) => {
     if (!req.params.id)
         return res.json({ error: 'Need the id of the container to kill', });
@@ -61,7 +61,7 @@ router.delete('/containers/:id', (req, res) => {
     let container = docker.getContainer(req.params.id);
     if (container) {
         let ok = false;
-        container.stop((err, data) => {
+        container.kill((err, data) => {
             if (err)
                 return res.json({ error: `When trying to kill container: ${err}`, });
             else

@@ -80,10 +80,10 @@ function createContainer() {
     // gather the form data to send to the api
     let data = {
         containerName: document.getElementById('containerName').value,
-        attachStdin: document.getElementById('attachStdin').value,
-        attachStdout: document.getElementById('attachStdout').value,
-        attachStderr: document.getElementById('attachStderr').value,
-        tty: document.getElementById('tty').value,
+        attachStdin: document.getElementById('attachStdin').checked,
+        attachStdout: document.getElementById('attachStdout').checked,
+        attachStderr: document.getElementById('attachStderr').checked,
+        tty: document.getElementById('tty').checked,
         volumes: document.getElementById('volumes').value,
         newContainerSelectImage: document.getElementById('newContainerSelectImage').value,
         containerCommand: document.getElementById('containerCommand').value,
