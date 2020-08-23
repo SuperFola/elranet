@@ -40,7 +40,7 @@ router.post('/login',
 router.get('/logout',
     auth.ensureLoggedIn,
     (req, res) => {
-        req.session = undefined;
+        req.session.user = undefined;
         res.redirect('/');
     });
 
