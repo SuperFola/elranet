@@ -90,6 +90,26 @@
     </div>
 </div>
 
+<!-- modal for output streams of containers -->
+<div class="modal fade" id="containersStreamo" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="streamoTitle"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <pre><code id="streamoContent"></code></pre>
+            </div>
+        </div>
+        <div class="modal-footer" id="streamoFooter">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
 <script type="text/javascript">
     loadContainersList();
 </script>

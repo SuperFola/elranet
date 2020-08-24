@@ -58,7 +58,7 @@ function loadContainersList() {
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a class="dropdown-item bg-danger text-white" href="#" onclick="killContainer('${container.Id}')">Kill</a>
-        <a class="dropdown-item" href="#" onclick="">Another action</a>
+        <a class="dropdown-item" href="#" onclick="getStdout('${container.Name}')">Read stdout</a>
         <a class="dropdown-item" href="#" onclick="">Something else here</a>
     </div>
 </div>`;
@@ -104,6 +104,24 @@ function createContainer() {
         $('#newContainerModal').modal('hide');
         // reload container list since it changed
         loadContainersList();
+    });
+}
+
+function getStdout(name) {
+    fetch(`/api/containers/${name}/streamo`, {
+        method: 'GET',
+    })
+    .then(res => res.json())
+    .then(json => {
+        document.getElementById('streamoTitle').innerHTML = `stdout ${name}`;
+        document.getElementById('streamoContent').innerHTML = json.data;
+        let button = document.createElement('button');
+            button.attributes.type = 'button';
+            button.className = 'btn btn-primary';
+            button.onclick = () => getStdout(name);
+            button.innerHTML = 'Refresh';
+        document.getElementById('streamoFooter').appendChild(button);
+        $('#containersStreamo').modal();
     });
 }
 
