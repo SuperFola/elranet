@@ -1,26 +1,12 @@
 'use strict';
 
 const express = require('express');
-const MemoryStream = require('memorystream');
 const logger = require('../logger');
 
 const router = express.Router();
 const docker = require('../docker');
 
-function makeid(length) {
-    let result           = '';
-    let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let charactersLength = characters.length;
-    for (let i = 0; i < length; i++) {
-       result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    }
-    return result;
- }
-
 // ---------------- CONTAINERS ------------------ //
-
-// image name -> stream
-let streams = {};
 
 // list all the containers
 router.get('/containers', (req, res) => {
@@ -43,17 +29,14 @@ router.post('/containers', (req, res) => {
         AttachStdout: req.body.attachStdout,
         AttachStderr: req.body.attachStderr,
     };
+
     if (req.body.containerName !== '')
         options.name = req.body.containerName;
-    else
-        options.name = req.body.newContainerSelectImage.split(':')[0] + '-' + makeid(5);
-
-    streams[options.name] = new MemoryStream();
 
     docker.run(
         req.body.newContainerSelectImage,
         req.body.containerCommand.split(' '),
-        streams[options.name],
+        process.stdout,
         options,
         (err, data, container) => {
             if (err)
@@ -66,16 +49,6 @@ router.post('/containers', (req, res) => {
     return res.json({ success: 'container was created' });
 });
 
-// read the output stream of a container
-router.get('/containers/:name/streamo', (req, res) => {
-    if (!req.params.name)
-        return res.json({ error: 'Need the name of the container to get the output stream of', });
-    if (!streams[req.params.name])
-        return res.json({ error: 'Couldn\'t find the wanted stream', });
-
-    return res.json({ data: streams[options.name].read(), });
-});
-
 // kill a container
 router.delete('/containers/:id', (req, res) => {
     if (!req.params.id)
@@ -85,6 +58,24 @@ router.delete('/containers/:id', (req, res) => {
     if (container) {
         container.kill((err, data) => {});
         return res.json({ success: 'Container was killed', });
+    }
+    return res.json({ error: 'Couldn\'t find container', });
+});
+
+// get running processes in a container
+router.get('/containers/:id/ps', (req, res) => {
+    if (!req.params.id)
+        return res.json({ error: 'Need the id of the container to get running processes of', })
+
+    let container = docker.getContainer(req.params.id);
+    if (container) {
+        container.top((err, data) => {
+            if (err)
+                res.json({ error: err, });
+            else
+                res.json(data);
+        });
+        return;
     }
     return res.json({ error: 'Couldn\'t find container', });
 });

@@ -40,7 +40,7 @@ function loadContainersList() {
             let tr = document.createElement('tr');
                 let id = document.createElement('th');
                     id.innerHTML = container.Id.substr(0, 12);
-                    id.attributes.scope = "row";
+                    id.attributes.scope = 'row';
                 let name = document.createElement('td');
                     name.innerHTML = container.Names[0];
                 let image = document.createElement('td');
@@ -58,8 +58,7 @@ function loadContainersList() {
     </button>
     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
         <a class="dropdown-item bg-danger text-white" href="#" onclick="killContainer('${container.Id}')">Kill</a>
-        <a class="dropdown-item" href="#" onclick="getStdout('${container.Name}')">Read stdout</a>
-        <a class="dropdown-item" href="#" onclick="">Something else here</a>
+        <a class="dropdown-item" href="#" onclick="getPs('${container.Id}')">Process list</a>
     </div>
 </div>`;
 
@@ -107,21 +106,57 @@ function createContainer() {
     });
 }
 
-function getStdout(name) {
-    fetch(`/api/containers/${name}/streamo`, {
+function getPs(id) {
+    fetch(`/api/containers/${id}/ps`, {
         method: 'GET',
     })
     .then(res => res.json())
     .then(json => {
-        document.getElementById('streamoTitle').innerHTML = `stdout ${name}`;
-        document.getElementById('streamoContent').innerHTML = json.data;
-        let button = document.createElement('button');
-            button.attributes.type = 'button';
-            button.className = 'btn btn-primary';
-            button.onclick = () => getStdout(name);
-            button.innerHTML = 'Refresh';
-        document.getElementById('streamoFooter').appendChild(button);
-        $('#containersStreamo').modal();
+        // set title
+        document.getElementById('psTitle').innerHTML = `ps ${id}`;
+
+        // general table with content
+        let table = document.createElement('table');
+            table.className = 'table';
+            let thead = document.createElement('thead');
+                let tr = document.createElement('tr');
+                    for (let e of json['Titles']) {
+                        let th = document.createElement('th');
+                            th.attributes.scope = 'col';
+                            th.innerHTML = e;
+                        tr.appendChild(th);
+                    }
+                thead.appendChild(tr);
+                table.appendChild(thead);
+            let tbody = document.createElement('tbody');
+                for (let p of json['Processes']) {
+                    let tr2 = document.createElement('tr');
+                    for (let e of p) {
+                        let td = document.createElement('td');
+                            td.innerHTML = e;
+                        tr2.appendChild(td);
+                    }
+                    tbody.appendChild(tr2);
+                }
+                table.appendChild(tbody);
+            document.getElementById('psContent').innerHTML = '';
+            document.getElementById('psContent').appendChild(table);
+
+        // set footer
+        if (!document.getElementById('psClose')) {
+            let button = document.createElement('button');
+                button.type = 'button';
+                button.className = 'btn btn-primary';
+                button.onclick = () => getPs(id);
+                button.innerHTML = 'Refresh';
+                button.id = 'psClose';
+            document.getElementById('psFooter').appendChild(button);
+        } else {
+            document.getElementById('psClose').onclick = () => getPs(id);
+        }
+
+        // show modal
+        $('#containerPs').modal();
     });
 }
 
